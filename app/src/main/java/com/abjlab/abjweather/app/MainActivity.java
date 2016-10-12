@@ -1,9 +1,15 @@
 package com.abjlab.abjweather.app;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.app.Activity;
+import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
@@ -29,11 +35,36 @@ public class MainActivity extends Activity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
             return true;
+        }
+
+        switch (id){
+            case R.id.action_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
+                return true;
+            case R.id.action_map:
+                onPreferredLocation();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
 
+    private void onPreferredLocation(){
+        SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(this);
+        String location = shared.getString(getString(R.string.pref_location_key), getString(R.string.pref_location_default));
+
+        Uri locationUri = Uri.parse("geo:0,0?q="+location);
+       // Toast.makeText(this.getApplicationContext(), "geo:0,0?q="+location, Toast.LENGTH_SHORT).show();
+        Intent launchMap = new Intent(Intent.ACTION_VIEW, locationUri);
+        if(launchMap.resolveActivity(getPackageManager()) != null){
+            startActivity(launchMap);
+        }else{
+            Log.d("MAP", "Can't launch Map");
+        }
+
+
+    }
 }
